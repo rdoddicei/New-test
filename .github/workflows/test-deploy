@@ -73,7 +73,7 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
-
+    environment: ${{ inputs.Environment }}
     steps:
       # Checkout the repository
       - name: Checkout Code
