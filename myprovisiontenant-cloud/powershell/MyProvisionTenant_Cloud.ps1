@@ -1,12 +1,20 @@
-
-#Set location to the script root
+#Updated Powershell Code
 Set-Location $PSScriptRoot;
 
-
 #Load needed modules
-. .\FormattedHelperFunctions.ps1;
-. .\HelperFunctions.ps1;
-Load-Modules
+Import-Module -Name .\HelperFunctions.ps1;
+Import-Module -Name .\exec-query.ps1;
+Import-Module -Name .\New-SqlConnection.ps1;
+Import-Module -Name .\BMQRAuthentication.psm1;
+Import-Module -Name .\BMQRAuth0.psm1;
+Import-Module SqlServer -WarningAction SilentlyContinue -DisableNameChecking
+Import-Module -Name .\DBAFunctions.psm1;
+Import-Module -Name .\AzureRunbooks.psm1;
+#Import-Module Sqlps -WarningAction SilentlyContinue -DisableNameChecking
+#######################################
+#Variables
+#######################################
+# Access the environment variables in PowerShell
 
 #######################################
 #Variables
