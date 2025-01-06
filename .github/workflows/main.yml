@@ -59,12 +59,6 @@ on:
         required: true
         type: string
         default: aehileman@coolblue.com
-
-      Environment:
-        description: 'Release Environment'
-        required: true
-        default: 'Development'
-        type: environment
         
 permissions:
   id-token: write
