@@ -20,19 +20,24 @@ Import-Module -Name .\AzureRunbooks.psm1;
 #Variables
 #######################################
 
-$customerID = Read-Host "What is the customerID?"
-$customerID = $customerID.ToLower()
-$customerName = Read-Host "What is the Customer Name?"
-$customerSN = Read-Host "Enter the Customer Serial Number"
+$clientId = $env:AZURE_CLIENT_ID
+$tenantId = $env:AZURE_TENANT_ID
+$clientSecret = $env:AZURE_CLIENT_SECRET
 
-$environmentTypes = "PRODUCTION", "VALIDATION", "DEVELOPMENT", "TESTING"
-$environmentType = $environmentTypes | Out-GridView -Title "Select the Customer Environment Type" -PassThru
-
-$deploymentModes = "BPT", "NO_BPT"
-$deploymentMode = $deploymentModes | Out-GridView -Title "What deployment mode of R4 are you deploying?" -PassThru
-
-$customertypes = "CLOUD_ESSENTIALS", "CLOUD_BP_CONFIG", "CLOUD"
-$customertype = $customertypes | Out-GridView -Title "Select the Customer Type" -PassThru
+if (-not $clientId -or -not $tenantId -or -not $clientSecret) {
+    Write-Error "Required Azure environment variables are missing."
+    exit 1
+}
+Write-Host "customerID: $env:CUSTOMER_ID"
+Write-Host "customerName: $env:CUSTOMER_NAME"
+Write-Host "customerSN: $env:CUSTOMER_SN"
+Write-Host "environmentType: $env:ENVIRONMENT_TYPE"
+Write-Host "deploymentMode: $env:DEPLOYMENT_MODE"
+Write-Host "customertypes: $env:CUSTOMER_TYPE"
+Write-Host "subscriptionName: $env:SUBSCRIPTION_NAME"
+Write-Host "region: $env:REGION"
+Write-Host "regionAbbrev: $env:REGION_ABBREV"
+Write-Host "resourceGroup: $env:RESOURCE_GROUP"
 
 $auth0ConnectionName = "coolblue-waad"
 
