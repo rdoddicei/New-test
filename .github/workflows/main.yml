@@ -84,11 +84,18 @@ jobs:
         git lfs pull
       shell: pwsh
 
+    - name: Fetch LFS Files
+      run: |
+        echo "Fetching LFS files:"
+        git lfs fetch --all
+      shell: pwsh 
+
     - name: Debug LFS Files
       run: |
         echo "Debugging LFS files:"
         git lfs ls-files -l
-      shell: pwsh
+        git lfs status
+      shell: pwsh 
 
     - name: List Files with Sizes
       run: |
