@@ -99,3 +99,14 @@ jobs:
         run: |
           Write-Host "Displaying .bak file sizes in MB:"
           Get-ChildItem -Path . -Recurse | Where-Object { $_.Extension -eq ".bak" } | Select-Object Name, @{Name="SizeMB";Expression={[math]::round($_.Length / 1MB, 2)}} | Format-Table -AutoSize
+          
+      
+
+      - name: Display File Sizes in MB
+        shell: pwsh
+        run: |
+          Write-Host "Displaying file sizes in MB:"
+          Get-ChildItem -Path . -Recurse | 
+          Where-Object { -not $_.PSIsContainer } | 
+          Select-Object Name, @{Name='Size(MB)'; Expression={[math]::Round($_.Length / 1MB, 2)}} | 
+          Format-Table -AutoSize
