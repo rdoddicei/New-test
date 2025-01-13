@@ -73,7 +73,18 @@ jobs:
         uses: actions/checkout@v4
         with:
           lfs: true
-        
+
+      - name: Install Git LFS
+        run: git lfs install
+        shell: pwsh
+
+      - name: Verify LFS Files
+        run: |
+          git lfs ls-files
+          git lfs pull
+        shell: pwsh
+      
+              
 
       # # Set up PowerShell environment
       # - name: Setup PowerShell Modules
