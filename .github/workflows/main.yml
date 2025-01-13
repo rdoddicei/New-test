@@ -63,6 +63,7 @@ on:
 permissions:
   id-token: write
   contents: read
+
 jobs:
   build:
     runs-on: windows-latest
@@ -85,6 +86,6 @@ jobs:
 
     - name: List Files with Sizes
       run: |
-        echo "Listing files in the repository with sizes:"
+        echo "Listing files in the repository with sizes in KB:"
         Get-ChildItem -Recurse | Select-Object Name, @{Name="SizeKB";Expression={[math]::round($_.Length / 1KB, 2)}} | Format-Table -AutoSize
       shell: pwsh
