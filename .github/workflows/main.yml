@@ -84,6 +84,12 @@ jobs:
         git lfs pull
       shell: pwsh
 
+    - name: Debug LFS Files
+      run: |
+        echo "Debugging LFS files:"
+        git lfs ls-files -l
+      shell: pwsh
+
     - name: List Files with Sizes
       run: |
         echo "Listing files in the repository with sizes in KB:"
