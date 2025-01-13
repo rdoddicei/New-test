@@ -63,7 +63,6 @@ on:
 permissions:
   id-token: write
   contents: read
-
 jobs:
   build:
     runs-on: windows-latest
@@ -71,6 +70,12 @@ jobs:
     - name: Install Git LFS
       run: git lfs install
       shell: pwsh
+    
+    # Checkout the repository
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        lfs: true
 
     - name: Verify LFS Files
       run: |
@@ -78,185 +83,8 @@ jobs:
         git lfs pull
       shell: pwsh
 
-
-      # Checkout the repository
-    - name: Checkout Code
-      uses: actions/checkout@v4
-      with:
-        lfs: true
-
-
-      
-              
-
-      # # Set up PowerShell environment
-      # - name: Setup PowerShell Modules
-      #   shell: pwsh
-      #   run: |
-      #     # Step 1: Locate AzureRM module
-      #     Write-Host "Checking for AzureRM module..."
-      #     $modules = Get-Module -ListAvailable -Name AzureRM | Select-Object Name, Version, Path
-
-      #     if ($modules) {
-      #       Write-Host "AzureRM module found at the following locations:"
-      #       $modules | ForEach-Object { Write-Host $_.Path }
-
-      #       # Step 2: Manually remove AzureRM module
-      #       foreach ($module in $modules) {
-      #         Write-Host "Removing AzureRM module from: $($module.Path)"
-      #         Remove-Item -Recurse -Force -Path $module.Path -ErrorAction SilentlyContinue
-      #       }
-
-      #       # Step 3: Clear cached module data
-      #       Write-Host "Clearing cached AzureRM module data..."
-      #       Remove-Module -Name AzureRM -Force -ErrorAction SilentlyContinue
-      #     } else {
-      #       Write-Host "AzureRM module not found. Skipping removal."
-      #     }
-
-      #     # Step 4: Ensure Az module is installed
-      #     Write-Host "Ensuring Az module is installed..."
-      #     Install-Module -Name Az -AllowClobber -Force -Scope CurrentUser
-
-      #     # Step 5: Verify Az module functionality
-      #     Write-Host "Checking Az module functionality..."
-      #     Import-Module Az -Force
-      #     Get-Module -ListAvailable -Name Az | Select-Object Name, Version, Path
-
-      # Step 2: List files in the repository
-    - name: List Files in the Repository
+    - name: List Files with Sizes
       run: |
-        echo "Listing files in the repository:"
-        Get-ChildItem -Recurse | Format-Table Name, Length
+        echo "Listing files in the repository with sizes:"
+        Get-ChildItem -Recurse | Select-Object Name, @{Name="SizeKB";Expression={[math]::round($_.Length / 1KB, 2)}} | Format-Table -AutoSize
       shell: pwsh
-
-      # # Step 3: Debug .env File Content
-      # - name: Debug .env File Content
-      #   run: |
-      #     $envFilePath = "myprovisiontenant-cloud/powershell/.env"
-      #     if (Test-Path $envFilePath) {
-      #       Write-Host "Contents of .env file:"
-      #       Get-Content $envFilePath
-      #     } else {
-      #       Write-Error ".env file not found at path: $envFilePath"
-      #     }
-      #   shell: pwsh
-
-      # # Step 4: Set Environment Variables
-      # - name: Set Environment Variables
-      #   run: |
-      #     $envFilePath = "myprovisiontenant-cloud/powershell/.env"
-      #     if (Test-Path $envFilePath) {
-      #       Get-Content $envFilePath | ForEach-Object {
-      #         if ($_ -match '^\s*([^#=\s]+)\s*=\s*(.*)\s*$') {
-      #           $key = $Matches[1].Trim()
-      #           $value = $Matches[2].Trim()
-      #           Write-Host "Setting $key=$value"
-      #           echo "$key=$value" >> $env:GITHUB_ENV
-      #         }
-      #       }
-      #     } else {
-      #       Write-Error ".env file not found at path: $envFilePath"
-      #     }
-
-      #     # Add user input variables
-      #     echo "DEPLOYMENT_MODES=${{ github.event.inputs.deploymentMode }}" >> $env:GITHUB_ENV
-      #     echo "CUSTOMER_TYPE=${{ github.event.inputs.customerType }}" >> $env:GITHUB_ENV
-      #     echo "SUBSCRIPTION_NAME=${{ github.event.inputs.subscriptionName }}" >> $env:GITHUB_ENV
-      #     echo "RESOURCE_GROUP=${{ github.event.inputs.resourceGroup }}" >> $env:GITHUB_ENV
-      #     echo "CLUSTER_NAME=${{ github.event.inputs.clusterName }}" >> $env:GITHUB_ENV
-      #     echo "BMQR_ADMIN_USER=${{ github.event.inputs.bmqrAdminUser }}" >> $env:GITHUB_ENV
-      #     echo "BMQR_PM_USER=${{ github.event.inputs.bmqrPMUser }}" >> $env:GITHUB_ENV
-
-      #     # Explicitly set the Azure environment variables from GitHub secrets
-      #     echo "AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" >> $env:GITHUB_ENV
-      #     echo "AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" >> $env:GITHUB_ENV
-      #     echo "AZURE_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }}" >> $env:GITHUB_ENV
-      #   shell: pwsh
-
-      # # Step 5: Debug Environment Variables
-      # - name: Debug Environment Variables
-      #   run: |
-      #     Write-Host "Environment variables loaded from .env file and user inputs:"
-      #     Get-ChildItem Env: | Where-Object { $_.Name -in @(
-      #       'CUSTOMER_ID',
-      #       'CUSTOMER_NAME',
-      #       'CUSTOMER_SN',
-      #       'CUSTOMER_ENV_TYPE',
-      #       'REGION',
-      #       'REGION_ABBREV',
-      #       'APP_GATEWAY_NAME',
-      #       'DEPLOYMENT_VERSION',
-      #       'RAM_WEBAPP',
-      #       'SIGNALR_WEBAPP',
-      #       'WEBAPI_WEBAPP',
-      #       'RAM_REPORTS_WEBAPP',
-      #       'AUTOMATION_TOPIC_NAME',
-      #       'BATCH_TOPIC_NAME',
-      #       'NOTIFICATION_TOPIC_NAME',
-      #       'SYS_CONFIG',
-      #       'UPDATE_EMAIL_ADDR',
-      #       'BMQR_ADMIN_USER',
-      #       'DEPLOYMENT_MODES',
-      #       'CUSTOMER_TYPE',
-      #       'SUBSCRIPTION_NAME',
-      #       'RESOURCE_GROUP',
-      #       'CLUSTER_NAME',
-      #       'BMQR_ADMIN_USER',
-      #       'BMQR_PM_USER',
-      #       'IS_MULTI_SITE',
-      #       'APP_ENV_RESOURCEGROUP',
-      #       'AZURE_CLIENT_ID',
-      #       'AZURE_TENANT_ID',
-      #       'AZURE_CLIENT_SECRET'
-      #     ) } | ForEach-Object { Write-Host "$($_.Name)=$($_.Value)" }
-      #   shell: pwsh
-
-      # # Step 6: Run PowerShell Script
-      # - name: Run PowerShell Script
-      #   run: |
-      #     ./myprovisiontenant-cloud/powershell/MyProvisionTenant_Cloud.ps1 
-      #     -customerID $env:CUSTOMER_ID 
-      #     -customerName $env:CUSTOMER_NAME 
-      #     -customerSN $env:CUSTOMER_SN 
-      #     -customerEnvType $env:CUSTOMER_ENV_TYPE
-      #     -deploymentModes $env:DEPLOYMENT_MODES
-      #     -customerType $env:CUSTOMER_TYPE
-      #     -subscriptionName $env:SUBSCRIPTION_NAME
-      #     -region $env:REGION
-      #     -regionAbbrev $env:REGION_ABBREV
-      #     -resourceGroup $env:RESOURCE_GROUP
-      #     -appGatewayName $env:APP_GATEWAY_NAME
-      #     -clusterName $env:CLUSTER_NAME
-      #     -deployVersion $env:DEPLOYMENT_VERSION
-      #     -ramWebApp $env:RAM_WEBAPP
-      #     -signalRWebApp $env:SIGNALR_WEBAPP
-      #     -webApiWebApp $env:WEBAPI_WEBAPP
-      #     -ramReportsWebApp $env:RAM_REPORTS_WEBAPP
-      #     -automationTopicName $env:AUTOMATION_TOPIC_NAME
-      #     -batchTopicName $env:BATCH_TOPIC_NAME
-      #     -notificationTopicName $env:NOTIFICATION_TOPIC_NAME
-      #     -bmqrAdminUser $env:BMQR_ADMIN_USER
-      #     -bmqrPMUser $env:BMQR_PM_USER
-      #     -sysConfig $env:SYS_CONFIG
-      #     -appEnvResourceGroup $env:APP_ENV_RESOURCEGROUP
-      #     -AZURE_CLIENT_ID $env:AZURE_CLIENT_ID
-      #     -AZURE_TENANT_ID $env:AZURE_TENANT_ID
-      #     -AZURE_CLIENT_SECRET $env:AZURE_CLIENT_SECRET
-      #   shell: pwsh
-      #   continue-on-error: false
-
-      # # Step 7: Terraform Setup and Execution
-      # - name: Setup Terraform
-      #   run: |
-      #     curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-      #     sudo apt update && sudo apt install terraform
-      #   shell: bash
-
-      # - name: Terraform Init
-      #   run: terraform init
-      #   shell: bash
-
-      # - name: Terraform Apply
-      #   run: terraform apply -auto-approve
-      #   shell: bash
