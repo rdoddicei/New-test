@@ -68,21 +68,24 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
+    - name: Install Git LFS
+      run: git lfs install
+      shell: pwsh
+
+    - name: Verify LFS Files
+      run: |
+        git lfs ls-files
+        git lfs pull
+      shell: pwsh
+
+
       # Checkout the repository
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          lfs: true
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        lfs: true
 
-      - name: Install Git LFS
-        run: git lfs install
-        shell: pwsh
 
-      - name: Verify LFS Files
-        run: |
-          git lfs ls-files
-          git lfs pull
-        shell: pwsh
       
               
 
@@ -121,11 +124,11 @@ jobs:
       #     Get-Module -ListAvailable -Name Az | Select-Object Name, Version, Path
 
       # Step 2: List files in the repository
-      - name: List Files in the Repository
-        run: |
-          echo "Listing files in the repository:"
-          Get-ChildItem -Recurse | Format-Table Name, Length
-        shell: pwsh
+    - name: List Files in the Repository
+      run: |
+        echo "Listing files in the repository:"
+        Get-ChildItem -Recurse | Format-Table Name, Length
+      shell: pwsh
 
       # # Step 3: Debug .env File Content
       # - name: Debug .env File Content
