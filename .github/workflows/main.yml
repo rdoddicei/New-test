@@ -73,6 +73,9 @@ jobs:
       - name: Verify Git LFS Installation
         run: git lfs install
 
+      - name: Pull LFS Files
+        run: git lfs pull
+
       # Step 3: Show file sizes in MB
       - name: Display File Sizes in MB
         shell: pwsh
@@ -82,3 +85,4 @@ jobs:
           Where-Object { -not $_.PSIsContainer } | 
           Select-Object Name, @{Name='Size(MB)'; Expression={[math]::Round($_.Length / 1MB, 2)}} | 
           Format-Table -AutoSize
+        
