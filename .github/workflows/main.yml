@@ -75,6 +75,13 @@ jobs:
 
       - name: Pull LFS Files
         run: git lfs pull
+      
+       # Step 4: Check for Pointer Files
+      - name: Check for Pointer Files
+        run: |
+          echo "Checking for LFS pointer files..."
+          grep -r "version https://git-lfs.github.com/spec/v1" . || echo "No pointer files found."
+
 
       # Step 3: Show file sizes in MB
       - name: Display File Sizes in MB
