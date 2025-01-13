@@ -63,40 +63,22 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-    - name: Install Git LFS
-      run: git lfs install
-      shell: pwsh
-    
-    # Checkout the repository
-    - name: Checkout Code
-      uses: actions/checkout@v3
-      with:
-        lfs: true
+      # Step 1: Checkout the repository with LFS
+      - name: Checkout repository with LFS
+        uses: actions/checkout@v3
+        with:
+          lfs: true
 
-    - name: Verify LFS Files
-      run: |
-        echo "Verifying LFS files:"
-        git lfs ls-files
-        git lfs pull
-      shell: pwsh
+      # Step 2: Verify Git LFS installation
+      - name: Verify Git LFS Installation
+        run: git lfs install
 
-    - name: Ensure All LFS Files are Fetched
-      run: |
-        echo "Fetching all LFS files:"
-        git lfs fetch --all
-        git lfs checkout
-      shell: pwsh
-
-    - name: List File Sizes in Repository
-      run: |
-        echo "Listing files with sizes in KB:"
-        Get-ChildItem -Recurse | Select-Object Name, @{Name="SizeKB";Expression={[math]::round($_.Length / 1KB, 2)}} | Format-Table -AutoSize
-      shell: pwsh
-
-    - name: Verify Specific LFS File
-      run: |
-        echo "Verifying specific LFS file sizes:"
-        git lfs ls-files -l
-        git lfs status
-        Get-ChildItem -Recurse -File | Where-Object { $_.Name -match '<specific-file-name>' } | Format-List Name, Length
-      shell: pwsh
+      # Step 3: Show file sizes in MB
+      - name: Display File Sizes in MB
+        shell: pwsh
+        run: |
+          Write-Host "Displaying file sizes in MB:"
+          Get-ChildItem -Path . -Recurse | 
+          Where-Object { -not $_.PSIsContainer } | 
+          Select-Object Name, @{Name='Size(MB)'; Expression={[math]::Round($_.Length / 1MB, 2)}} | 
+          Format-Table -AutoSize
