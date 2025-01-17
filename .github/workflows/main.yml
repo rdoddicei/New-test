@@ -1,112 +1,17 @@
-name: PowerShell Execution & Terraform Deployment
+on: [push]
 
-on:
-  workflow_dispatch:
-    inputs:
-      deploymentMode:
-        description: 'Select the deployment mode'
-        required: true
-        type: choice
-        options:
-          - BPT
-          - NO_BPT
-        
-      customerType:
-        description: 'Select the Customer Type'
-        required: true
-        type: choice
-        options:
-          - CLOUD_ESSENTIALS
-          - CLOUD_BP_CONFIG
-          - CLOUD
-
-      subscriptionName:
-        description: 'Enter the subscription name'
-        required: true
-        type: choice
-        options:
-          - BMQR-BPT-DEVELOPMENT
-          - BMQR-BPT-PRODUCTION
-          - OTHER
-
-      resourceGroup:
-        description: 'Enter the resource group'
-        required: true
-        type: choice
-        options:
-          - dev-r4-dev-cei-eus-rg-01
-          - BMQR_IT
-          - BMQR
-      
-      clusterName:
-        description: 'Enter the cluster name'
-        required: true
-        type: choice
-        options:
-          - olympus
-          - sinai
-          - elbrus
-        default: sinai
-
-      bmqrAdminUser:
-        description: 'Enter the BMQR Admin User'
-        required: true
-        type: string
-        default: Rdoddi@coolblue.com
-
-      bmqrPMUser:
-        description: 'Enter the BMQR PM User'
-        required: true
-        type: string
-        default: aehileman@coolblue.com
-        
-permissions:
-  id-token: write
-  contents: read
+name: InstallAzureCLI
 
 jobs:
-  validate-lfs:
-    runs-on: windows-latest
-
+  install-and-configure:
+    runs-on: windows-latest  # Specifies a self-hosted Windows runner
     steps:
-      # Step 1: Checkout repository with LFS enabled
-      - name: Checkout repository with LFS
-        uses: actions/checkout@v3
-        with:
-          lfs: true
-
-      # Step 2: Ensure Git LFS is Installed
-      - name: Verify Git LFS Installation
+      - name: Install Azure CLI using PowerShell
         run: |
-          git lfs install
-          git lfs version
+          Write-Host "Downloading and installing Azure CLI..."
+          Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi
+          Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
+        shell: pwsh  # Ensure PowerShell is used as the shell
 
-      # Step 3: Force Fetch and Pull LFS Files
-      - name: Force Fetch and Pull LFS Files
-        run: |
-          git lfs fetch --all
-          git lfs pull
-
-      # Step 4: Debug Pointer Files (Optional)
-      - name: Check for LFS Pointer Files
-        run: |
-          echo "Checking for .bak pointer files..."
-          grep -r "version https://git-lfs.github.com/spec/v1" . || echo "No pointer files found."
-
-      # Step 5: Verify File Sizes of .bak Files
-      - name: Display .bak File Sizes in MB
-        shell: pwsh
-        run: |
-          Write-Host "Displaying .bak file sizes in MB:"
-          Get-ChildItem -Path . -Recurse | Where-Object { $_.Extension -eq ".bak" } | Select-Object Name, @{Name="SizeMB";Expression={[math]::round($_.Length / 1MB, 2)}} | Format-Table -AutoSize
-          
-      
-
-      - name: Display File Sizes in MB
-        shell: pwsh
-        run: |
-          Write-Host "Displaying file sizes in MB:"
-          Get-ChildItem -Path . -Recurse | 
-          Where-Object { -not $_.PSIsContainer } | 
-          Select-Object Name, @{Name='Size(MB)'; Expression={[math]::Round($_.Length / 1MB, 2)}} | 
-          Format-Table -AutoSize
+      - name: Verify Azure CLI Installation
+        run: az --version
